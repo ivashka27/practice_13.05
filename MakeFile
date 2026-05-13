@@ -1,0 +1,6 @@
+all: rooms
+	./rooms
+rooms: main.o
+	g++ main.o -o rooms
+main.o: main.cpp
+	g++ -c main.cpp
