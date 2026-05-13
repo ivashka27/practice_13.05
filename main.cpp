@@ -63,6 +63,7 @@ void showMostVisitedRoom(Room** rooms, size_t size) {
 	}
 	if (MostVisitedRoom != nullptr) {
 		std::cout << "Самая посещаемая комната: " << MostVisitedRoom->getName() << std::endl;
+		std::cout << "Количество посещений: " << MostVisitedRoom->getVisitCount() << std::endl;
 	}
 	else {
 		std::cout << "Группа ещё не посетила ни одной комнаты" << std::endl;
