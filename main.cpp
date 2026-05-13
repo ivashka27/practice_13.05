@@ -17,20 +17,29 @@ public:
         name = n;
         type = t;
         capacity = c;
-        visitCount = 0; // Сначала посещений нет
+        visitCount = 0; 
     }
 
-    // Метод: посетить комнату
+    // Метод: увеличить счетчик посещений
     void visit() {
         visitCount++;
     }
 
-    // Метод: показать информацию
+    // Метод: вывести информацию о комнате
     void printInfo() {
         cout << "Название: " << name << endl;
         cout << "Тип: " << type << endl;
         cout << "Вместимость: " << capacity << endl;
-        cout << "Посещений: " << visitCount << endl;
+        cout << "Количество посещений: " << visitCount << endl;
+    }
+
+    // Геттеры (по ТЗ)
+    int getVisitCount() {
+        return visitCount;
+    }
+
+    string getName() {
+        return name;
     }
 };
 
@@ -43,33 +52,38 @@ public:
     // Конструктор гида
     Guide(string n) {
         name = n;
-        currentRoom = nullptr; // Сначала комнаты нет
+        currentRoom = nullptr; 
     }
 
     // Метод: перейти в комнату
     void goToRoom(Room* r) {
         currentRoom = r;
         if (currentRoom != nullptr) {
-            currentRoom->visit(); // Увеличиваем счетчик комнаты
+            currentRoom->visit(); 
         }
     }
 
-    // Метод: показать где мы
-    void showCurrentRoom() {
+    // Метод: вывести информацию о текущей комнате (название из ТЗ)
+    void printCurrentRoomInfo() {
         if (currentRoom == nullptr) {
-            cout << "Группа пока не в комнате." << endl;
+            cout << "Группа пока не находится ни в одной комнате." << endl;
         } else {
             cout << "Текущая комната:" << endl;
             currentRoom->printInfo();
         }
     }
+
+    // Геттер (по ТЗ)
+    Room* getCurrentRoom() {
+        return currentRoom;
+    }
 };
 
 int main() {
-    // Включаем русский язык в консоли
+    // Включаем русский язык
     setlocale(LC_ALL, "Russian");
 
-    // Создаем 5 комнат через new (динамически)
+    // 1. Создаем 5 комнат динамически (new)
     Room* rooms[5];
     rooms[0] = new Room("Переговорка Толстой", "переговорная", 12);
     rooms[1] = new Room("Кухня 3 этаж", "кухня", 20);
@@ -77,96 +91,104 @@ int main() {
     rooms[3] = new Room("Зона отдыха", "отдых", 15);
     rooms[4] = new Room("Серверная", "техническая", 5);
 
-    // Создаем гида
+    // 2. Создаем объект гида
     Guide guide("Иван");
 
     int choice;
     bool work = true;
 
-    // Главный цикл меню
+    // 3. Цикл меню
     while (work) {
-        cout << "\n===== Меню =====" << endl;
+        cout << "\n===== Экскурсия по офису Яндекса =====" << endl;
         cout << "1. Посетить комнату" << endl;
         cout << "2. Информация о текущей комнате" << endl;
-        cout << "3. Список посещённых комнат" << endl;
+        cout << "3. Показать все посещённые комнаты" << endl;
         cout << "4. Самая посещаемая комната" << endl;
         cout << "5. Выход" << endl;
-        cout << "Ваш выбор: ";
+        cout << "Выберите пункт: ";
         
         cin >> choice;
 
-        // Обработка выбора
         switch (choice) {
-        case 1: // Посетить комнату
-            cout << "\nСписок комнат:" << endl;
+        case 1: {
+            // Посетить комнату
+            cout << "\nДоступные комнаты:" << endl;
             for (int i = 0; i < 5; i++) {
-                cout << i + 1 << ". " << rooms[i]->name << endl;
+                cout << i + 1 << ". " << rooms[i]->getName() << endl; // Используем геттер
             }
-            cout << "Введите номер: ";
+            cout << "Введите номер комнаты: ";
             int num;
             cin >> num;
             
             if (num >= 1 && num <= 5) {
                 guide.goToRoom(rooms[num - 1]);
-                cout << "Перешли в комнату: " << rooms[num - 1]->name << endl;
+                cout << "Гид провёл группу в комнату: " << rooms[num - 1]->getName() << endl;
             } else {
-                cout << "Ошибка ввода." << endl;
+                cout << "Некорректный номер комнаты." << endl;
             }
             break;
-
-        case 2: // Информация
-            guide.showCurrentRoom();
+        }
+        case 2: {
+            // Информация о текущей комнате
+            guide.printCurrentRoomInfo();
             break;
+        }
+        case 3: {
+            // Показать все посещённые комнаты
+            bool hasVisited = false;
+            cout << "\nПосещённые комнаты:" << endl;
+            for (int i = 0; i < 5; i++) {
+                if (rooms[i]->getVisitCount() > 0) {
+                    // Вывод в формате из примера: Имя — Кол-во посещений
+                    cout << rooms[i]->getName() << " — " << rooms[i]->getVisitCount() << " посещений" << endl;
+                    hasVisited = true;
+                }
+            }
+            if (!hasVisited) {
+                cout << "Пока не посещено ни одной комнаты." << endl; // Текст из ТЗ
+            }
+            break;
+        }
+        case 4: {
+            // Найти самую посещаемую комнату
+            Room* mostVisited = nullptr;
+            int maxCount = -1;
+            bool foundAny = false;
 
-        case 3: // Все посещенные
-            {
-                bool found = false;
-                cout << "\nПосещённые комнаты:" << endl;
-                for (int i = 0; i < 5; i++) {
-                    if (rooms[i]->visitCount > 0) {
-                        cout << rooms[i]->name << " (" << rooms[i]->visitCount << " раз)" << endl;
-                        found = true;
+            for (int i = 0; i < 5; i++) {
+                int visits = rooms[i]->getVisitCount();
+                if (visits > 0) {
+                    foundAny = true; // Мы нашли хотя бы одну посещенную
+                    if (visits > maxCount) {
+                        maxCount = visits;
+                        mostVisited = rooms[i];
                     }
                 }
-                if (!found) cout << "Пока пусто." << endl;
+            }
+
+            if (!foundAny) {
+                cout << "Пока нет посещённых комнат." << endl; // Текст из ТЗ
+            } else {
+                cout << "Самая посещаемая комната: " << mostVisited->getName() << endl;
+                cout << "Количество посещений: " << mostVisited->getVisitCount() << endl;
             }
             break;
-
-        case 4: // Самая популярная
-            {
-                Room* best = nullptr;
-                int maxVisits = -1;
-                
-                for (int i = 0; i < 5; i++) {
-                    if (rooms[i]->visitCount > maxVisits) {
-                        maxVisits = rooms[i]->visitCount;
-                        best = rooms[i];
-                    }
-                }
-
-                if (best != nullptr) {
-                    cout << "Самая популярная: " << best->name << endl;
-                    cout << "Посещений: " << best->visitCount << endl;
-                } else {
-                    cout << "Ещё никто никуда не ходил." << endl;
-                }
-            }
-            break;
-
-        case 5: // Выход
+        }
+        case 5: {
+            // Выход
             work = false;
             break;
-
+        }
         default:
-            cout << "Нет такого пункта." << endl;
+            cout << "Неверный пункт меню. Попробуйте снова." << endl;
         }
     }
 
-    // Очистка памяти (удаление комнат)
+    // 4. Освобождение памяти (delete)
     for (int i = 0; i < 5; i++) {
         delete rooms[i];
     }
 
-    cout << "Конец программы." << endl;
+    cout << "Программа завершена. Всего доброго!" << endl;
     return 0;
 }
