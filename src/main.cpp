@@ -1,14 +1,9 @@
 #include "Guide.hpp"
 
-#include <clocale>
 #include <iostream>
 #include <limits>
 
 const int ROOM_COUNT = 5;
-
-void configureConsole() {
-    std::setlocale(LC_ALL, "Russian");
-}
 
 void clearInput() {
     std::cin.clear();
@@ -107,8 +102,6 @@ void printMostVisitedRoom(Room* rooms[], int roomCount) {
 }
 
 int main() {
-    configureConsole();
-
     Room* rooms[ROOM_COUNT];
     createRooms(rooms);
 
